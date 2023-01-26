@@ -1,0 +1,69 @@
+Private Sub ModBotao1_Click()
+    Dim texto, varText As Variant
+    Dim objCP As Object
+    Dim i As Integer
+    
+    texto = Modcampo1.Value
+
+    If texto = "" Then
+        MsgBox "Digite algo para concatenar"
+    Else
+        'colocando aspas e virgula em cada linha
+        Dim linhas() As String
+        linhas = Split(Modcampo1.Text, vbCrLf)
+        
+        For i = 0 To UBound(linhas) 'ubound para saber o tamanho
+            
+            If i = UBound(linhas) Then 'na ultima linha não irá por a virgula
+                linhas(i) = "'" & linhas(i) & "'"
+            Else
+                linhas(i) = "'" & linhas(i) & "',"
+            End If
+        Next
+        
+        Modcampo1.Value = "" 'limpando o txtbox
+        For i = 0 To UBound(linhas) 'mostrar o valor concatenado
+            Modcampo1.Value = Modcampo1.Value & "" & linhas(i) & vbCrLf
+        Next
+    
+        'Copia o resultado para Área de transferência
+        varText = Modcampo1.Value
+        Set objCP = CreateObject("HtmlFile")
+        objCP.ParentWindow.ClipboardData.SetData "text", varText
+         
+    End If
+End Sub
+
+Private Sub ModBotao2_Click()
+    Dim n1, n2, varText As Variant
+    Dim Formula As Double
+    Dim objCP As Object
+    
+    n1 = Modcheck.Value
+    n2 = Modaudiencia.Value
+
+    If IsNumeric(n1) = True And IsNumeric(n2) = True Then
+        Formula = (n1 / n2) * 100
+        Formula = Truncar(Formula, 2) 'chama a função truncar que irá deixar apenas 2 casas decimais
+        
+        Modresultado1.Caption = "Conversão " & Formula & "%"   'escrevendo no formulário o resultado
+        
+        'Copia o resultado para Área de transferência
+        varText = Modresultado1.Caption
+        Set objCP = CreateObject("HtmlFile")
+        objCP.ParentWindow.ClipboardData.SetData "text", varText
+            
+    Else
+        MsgBox "Coloque apenas números nos campos em branco"
+    End If
+End Sub
+
+'se caso clicar no X, irá abrir a planilha
+Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
+
+    If CloseMode = 0 Then
+        Unload Me 'fecha o formulario
+        'Application.Quit 'fecha o excel
+        Application.Visible = True 'após deixar a planilha visivel, a função ThisWorkbook.Workbook_Open irá minimizar a planilha
+    End If
+End Sub
